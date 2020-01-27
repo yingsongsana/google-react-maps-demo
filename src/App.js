@@ -2,13 +2,19 @@ import React from 'react';
 import './App.css';
 import axios from 'axios'
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react'
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 
 class App extends React.Component {
 constructor() {
   super() 
   this.state = {
     query: '',
-    selectedPlace: ''
+    center: '',
+    selectedPlace: '',
+    coordinates: {
+      lat: null,
+      lng: null
+    }
   }
 }
 
@@ -23,13 +29,20 @@ submitSearch = (event) => {
   console.log(process.env.REACT_APP_TEST)
   console.log(process.env.REACT_APP_CLIENT_ID)
   console.log(process.env.REACT_APP_CLIENT_SECRET)
-  axios({
-    url: `https://api.foursquare.com/v2/venues/explore?client_id=${process.env.REACT_APP_CLIENT_ID}&client_secret=${process.env.REACT_APP_CLIENT_SECRET}&v=20180323&limit=10&ll=42.3601,-71.0589&query=${this.state.query}`,
-    method: 'GET',
-    })
+  axios(`https://cors-anywhere.herokuapp.com/maps.googleapis.com/maps/api/place/findplacefromtext/json?input=general%20assembly&inputtype=textquery&fields=place_id,photos,formatted_address,name,rating,opening_hours,geometry&key=AIzaSyBr0KBe6OYC3MKAmWh4nfTPQrCQT6ei-O8`, { crossdomain: true })
     .then(console.log)
     .catch(alert)
-  this.setState({ query: '' })
+}
+
+handleChange = address => {
+  this.setState({ query: address })
+}
+
+handleSelect = async address => {
+  const results = await geocodeByAddress(address)
+  const coordinates = await getLatLng(results[0])
+  console.log(coordinates)
+  this.setState({ coordinates })
 }
 
 onMarkerClick = () => {
@@ -39,13 +52,53 @@ onMarkerClick = () => {
 render() {
   return (
     <div className="App">
-      
+
         <form onSubmit={this.submitSearch}>
           <input value = {this.state.query} onChange={this.updateQuery}></input>
           <button>Search</button>
-        </form>
 
-        <Map google={this.props.google} zoom={14}>
+        </form>
+        <br/>
+        <PlacesAutocomplete
+          value={this.state.query}
+          onChange={this.handleChange}
+          onSelect={this.handleSelect}
+        >
+          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+          <div>
+            <input
+              {...getInputProps({
+                placeholder: 'Search Places ...',
+                className: 'location-search-input',
+              })}
+            />
+            <div className="autocomplete-dropdown-container">
+              {loading && <div>Loading...</div>}
+              {suggestions.map(suggestion => {
+                const className = suggestion.active
+                  ? 'suggestion-item--active'
+                  : 'suggestion-item';
+                // inline style for demonstration purpose
+                const style = suggestion.active
+                  ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                  : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                return (
+                  <div
+                    {...getSuggestionItemProps(suggestion, {
+                      className,
+                      style,
+                    })}
+                  >
+                    <span>{suggestion.description}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        </PlacesAutocomplete>
+
+        <Map google={this.props.google} center={this.state.coordinates} zoom={14}>
  
           <Marker onClick={this.onMarkerClick}
                   name={'Current location'} />
