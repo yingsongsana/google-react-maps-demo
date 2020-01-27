@@ -78,7 +78,7 @@ render() {
         )}
         </PlacesAutocomplete>
 
-        <Map google={this.props.google} center={this.state.coordinates} zoom={14}>
+        <Map google={this.props.google} center={this.state.coordinates} initialCenter={{ lat: 42.3601, lng: -71.0589}} zoom={14}>
  
           <Marker onClick={this.onMarkerClick}
                   position={this.state.coordinates}
