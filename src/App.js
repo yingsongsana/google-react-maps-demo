@@ -1,20 +1,24 @@
 import React from 'react';
 import './App.css';
-import axios from 'axios'
+// import axios from 'axios'
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react'
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
+import TestComponent from './TestComponent'
 
 class App extends React.Component {
 constructor() {
   super() 
   this.state = {
+    userLocation: { lat: 42.3601, lng: -71.0589},
     query: '',
     center: '',
-    selectedPlace: '',
+    selectedPlace: 'hello',
+    selectedMarker: null,
     coordinates: {
       lat: null,
       lng: null
-    }
+    },
+    showWindow: false
   }
 }
 
@@ -28,11 +32,18 @@ handleSelect = async address => {
   console.log(results)
   console.log(coordinates)
   this.setState({ coordinates })
-  this.setState({ selectedPlace: results[0].place_id })
+  this.setState({ selectedPlace: results[0] })
 }
 
-onMarkerClick = () => {
-  alert('marker clicked')
+onMarkerClick = (props, marker, event) => {
+  // alert('marker clicked')
+  console.log(marker)
+  this.setState({ selectedMarker: marker })
+  this.setState({ showWindow: true })
+}
+
+onInfoWindowClose = () => {
+  this.setState({ showWindow: false })
 }
 
 render() {
@@ -78,16 +89,22 @@ render() {
         )}
         </PlacesAutocomplete>
 
-        <Map google={this.props.google} center={this.state.coordinates} initialCenter={{ lat: 42.3601, lng: -71.0589}} zoom={14}>
+        <Map google={this.props.google} center={this.state.coordinates} initialCenter={this.state.userLocation} zoom={14}>
  
           <Marker onClick={this.onMarkerClick}
                   position={this.state.coordinates}
                   name={'Current location'} />
   
-          <InfoWindow onClose={this.onInfoWindowClose}>
+          
+          <InfoWindow 
+            marker={this.state.selectedMarker}
+            position={this.state.coordinates}
+            visible={this.state.showWindow}
+            onClose={this.onInfoWindowClose}>
               <div>
-                <h1>{this.state.selectedPlace.name}</h1>
+               <h1>hello</h1>
               </div>
+              <TestComponent selectedPlace={this.state.selectedPlace} />
           </InfoWindow>
         </Map>
     </div>
