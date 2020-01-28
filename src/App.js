@@ -6,7 +6,7 @@ import TestComponent from './TestComponent'
 
 class App extends React.Component {
 constructor() {
-  super() 
+  super()
   this.state = {
     center: '',
     coordinates: {
@@ -95,12 +95,12 @@ render() {
              initialCenter={this.state.userLocation}
              zoom={14}
         >
- 
+
           <Marker onClick={this.onMarkerClick}
                   position={this.state.coordinates}
-                  name={'Current location'} 
+                  name={'Current location'}
           />
-  
+
           <InfoWindow marker={this.state.selectedMarker}
                       position={this.state.coordinates}
                       visible={this.state.showWindow}
