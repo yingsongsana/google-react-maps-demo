@@ -12,7 +12,7 @@ class TestComponent extends React.Component {
         return (
             <div>
                 <h1>test component</h1>
-                <p>{this.props.selectedPlace.place_id}</p>
+                <p>{this.props.placeData.place_id}</p>
             </div>
         )
     }

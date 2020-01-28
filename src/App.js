@@ -1,6 +1,5 @@
 import React from 'react';
 import './App.css';
-// import axios from 'axios'
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react'
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 import TestComponent from './TestComponent'
@@ -9,39 +8,42 @@ class App extends React.Component {
 constructor() {
   super() 
   this.state = {
-    userLocation: { lat: 42.3601, lng: -71.0589},
-    query: '',
     center: '',
-    selectedPlace: 'hello',
-    selectedMarker: null,
     coordinates: {
       lat: null,
       lng: null
     },
-    showWindow: false
+    query: '',
+    selectedMarker: null,
+    placeData: '',
+    showWindow: false,
+    userLocation: { lat: 42.3601, lng: -71.0589}
   }
 }
 
-handleChange = address => {
-  this.setState({ query: address })
+// set query to find Place data
+setQuery = value => {
+  this.setState({ query: value })
 }
 
-handleSelect = async address => {
-  const results = await geocodeByAddress(address)
+// send query to find Place data
+  // use Place data to get coordinates
+  // update state with coordinates and Place data
+handleAutocompleteSelect = async query => {
+  const results = await geocodeByAddress(query)
   const coordinates = await getLatLng(results[0])
-  console.log(results)
-  console.log(coordinates)
   this.setState({ coordinates })
-  this.setState({ selectedPlace: results[0] })
+  this.setState({ placeData: results[0] })
 }
 
+// set Marker data to state and show InfoWindow
+  // InfoWindow will display data from Marker state
 onMarkerClick = (props, marker, event) => {
-  // alert('marker clicked')
-  console.log(marker)
   this.setState({ selectedMarker: marker })
   this.setState({ showWindow: true })
 }
 
+// close InfoWindow
 onInfoWindowClose = () => {
   this.setState({ showWindow: false })
 }
@@ -52,8 +54,8 @@ render() {
 
         <PlacesAutocomplete
           value={this.state.query}
-          onChange={this.handleChange}
-          onSelect={this.handleSelect}
+          onChange={this.setQuery}
+          onSelect={this.handleAutocompleteSelect}
         >
           {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
           <div>
@@ -104,7 +106,7 @@ render() {
               <div>
                <h1>hello</h1>
               </div>
-              <TestComponent selectedPlace={this.state.selectedPlace} />
+              <TestComponent placeData={this.state.placeData} />
           </InfoWindow>
         </Map>
     </div>
