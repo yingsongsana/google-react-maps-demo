@@ -22,8 +22,8 @@ constructor() {
 }
 
 // set query to find Place data
-setQuery = value => {
-  this.setState({ query: value })
+setQuery = query => {
+  this.setState({ query })
 }
 
 // send query to find Place data
@@ -51,7 +51,6 @@ onInfoWindowClose = () => {
 render() {
   return (
     <div className="App">
-
         <PlacesAutocomplete
           value={this.state.query}
           onChange={this.setQuery}
@@ -91,22 +90,30 @@ render() {
         )}
         </PlacesAutocomplete>
 
-        <Map google={this.props.google} center={this.state.coordinates} initialCenter={this.state.userLocation} zoom={14}>
+        <Map google={this.props.google}
+             center={this.state.coordinates}
+             initialCenter={this.state.userLocation}
+             zoom={14}
+        >
  
           <Marker onClick={this.onMarkerClick}
                   position={this.state.coordinates}
-                  name={'Current location'} />
+                  name={'Current location'} 
+          />
   
-          
-          <InfoWindow 
-            marker={this.state.selectedMarker}
-            position={this.state.coordinates}
-            visible={this.state.showWindow}
-            onClose={this.onInfoWindowClose}>
+          <InfoWindow marker={this.state.selectedMarker}
+                      position={this.state.coordinates}
+                      visible={this.state.showWindow}
+                      onClose={this.onInfoWindowClose}
+          >
               <div>
-               <h1>hello</h1>
+                <h1>{this.state.query}</h1>
+                <p>{this.state.placeData.formatted_address}</p>
+                <a href={'https://developers.google.com/maps/documentation/javascript/tutorial'} target={'_blank'}>
+                  <button>display link to create a review</button>
+                </a>
+                <TestComponent placeData={this.state.placeData} />
               </div>
-              <TestComponent placeData={this.state.placeData} />
           </InfoWindow>
         </Map>
     </div>
