@@ -59,7 +59,7 @@ render() {
           {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
           <div>
             <input
-              style={{ height: '40px', fontSize: '16px' }}
+              style={{ height: '40px', width: '100%', fontSize: '16px' }}
               {...getInputProps({
                 placeholder: 'Search Places ...',
                 className: 'location-search-input',
