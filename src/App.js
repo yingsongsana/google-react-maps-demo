@@ -21,6 +21,13 @@ constructor() {
   }
 }
 
+componentDidMount = () => {
+  console.log('loaded app')
+//   google.maps.event.addListener(balloon, 'click', function() {
+//     infowindow.open(map,image_balloon);
+// });
+}
+
 // set query to find Place data
 setQuery = query => {
   this.setState({ query })
@@ -46,6 +53,12 @@ onMarkerClick = (props, marker, event) => {
 // close InfoWindow
 onInfoWindowClose = () => {
   this.setState({ showWindow: false })
+}
+
+clickMap = (mapProps, map, clickEvent) => {
+  console.log('clicked map')
+  console.log(clickEvent)
+  console.log(clickEvent.placeId)
 }
 
 render() {
@@ -95,6 +108,8 @@ render() {
              center={this.state.coordinates}
              initialCenter={this.state.userLocation}
              zoom={14}
+             clickableIcons={true}
+             onClick={this.clickMap}
         >
 
           <Marker onClick={this.onMarkerClick}
