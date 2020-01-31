@@ -25,11 +25,11 @@ constructor() {
 
 componentDidMount = () => {
   console.log('loaded app')
-  axios('http://www.geoplugin.net/json.gp')
+  axios('https://ipapi.co/json/')
     .then(res => {
       console.log(res)
-      const lat = parseFloat(res.data.geoplugin_latitude)
-      const lng = parseFloat(res.data.geoplugin_longitude)
+      const lat = res.data.latitude
+      const lng = res.data.longitude
       this.setState({ userLocation: { lat, lng } })
     })
 }
