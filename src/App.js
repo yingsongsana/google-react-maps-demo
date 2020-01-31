@@ -4,6 +4,8 @@ import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react'
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete'
 import TestComponent from './TestComponent'
 
+import axios from 'axios'
+
 class App extends React.Component {
 constructor() {
   super()
@@ -17,15 +19,19 @@ constructor() {
     selectedMarker: null,
     placeData: '',
     showWindow: false,
-    userLocation: { lat: 42.3601, lng: -71.0589}
+    userLocation: null
   }
 }
 
 componentDidMount = () => {
   console.log('loaded app')
-//   google.maps.event.addListener(balloon, 'click', function() {
-//     infowindow.open(map,image_balloon);
-// });
+  axios('http://www.geoplugin.net/json.gp')
+    .then(res => {
+      console.log(res)
+      const lat = parseFloat(res.data.geoplugin_latitude)
+      const lng = parseFloat(res.data.geoplugin_longitude)
+      this.setState({ userLocation: { lat, lng } })
+    })
 }
 
 // set query to find Place data
@@ -62,76 +68,81 @@ clickMap = (mapProps, map, clickEvent) => {
 }
 
 render() {
+  const map = (
+    <Map google={this.props.google}
+          center={this.state.coordinates}
+          initialCenter={this.state.userLocation}
+          zoom={14}
+          clickableIcons={true}
+          onClick={this.clickMap}
+    >
+
+      <Marker onClick={this.onMarkerClick}
+              position={this.state.coordinates}
+              name={'Current location'}
+      />
+
+      <InfoWindow marker={this.state.selectedMarker}
+                  position={this.state.coordinates}
+                  visible={this.state.showWindow}
+                  onClose={this.onInfoWindowClose}
+      >
+          <div>
+            <h1>{this.state.query}</h1>
+            <p>{this.state.placeData.formatted_address}</p>
+            <a href={'https://developers.google.com/maps/documentation/javascript/tutorial'} target={'_blank'}>
+              <button>display link to create a review</button>
+            </a>
+            <TestComponent placeData={this.state.placeData} />
+          </div>
+      </InfoWindow>
+    </Map>
+  )
+  
   return (
     <div className="App">
-        <PlacesAutocomplete
-          value={this.state.query}
-          onChange={this.setQuery}
-          onSelect={this.handleAutocompleteSelect}
-        >
-          {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-          <div>
-            <input
-              style={{ height: '40px', width: '100%', fontSize: '16px' }}
-              {...getInputProps({
-                placeholder: 'Search Places ...',
-                className: 'location-search-input',
-              })}
-            />
-            <div className="autocomplete-dropdown-container">
-              {loading && <div>Loading...</div>}
-              {suggestions.map(suggestion => {
-                const className = suggestion.active
-                  ? 'suggestion-item--active'
-                  : 'suggestion-item';
-                // inline style for demonstration purpose
-                const style = suggestion.active
-                  ? { backgroundColor: '#fafafa', cursor: 'pointer' }
-                  : { backgroundColor: '#ffffff', cursor: 'pointer' };
-                return (
-                  <div
-                    {...getSuggestionItemProps(suggestion, {
-                      className,
-                      style,
-                    })}
-                  >
-                    <span>{suggestion.description}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-        </PlacesAutocomplete>
-
-        <Map google={this.props.google}
-             center={this.state.coordinates}
-             initialCenter={this.state.userLocation}
-             zoom={14}
-             clickableIcons={true}
-             onClick={this.clickMap}
-        >
-
-          <Marker onClick={this.onMarkerClick}
-                  position={this.state.coordinates}
-                  name={'Current location'}
+      <PlacesAutocomplete
+        value={this.state.query}
+        onChange={this.setQuery}
+        onSelect={this.handleAutocompleteSelect}
+      >
+        {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+        <div>
+          <input
+            style={{ height: '40px', width: '100%', fontSize: '16px' }}
+            {...getInputProps({
+              placeholder: 'Search Places ...',
+              className: 'location-search-input',
+            })}
           />
-
-          <InfoWindow marker={this.state.selectedMarker}
-                      position={this.state.coordinates}
-                      visible={this.state.showWindow}
-                      onClose={this.onInfoWindowClose}
-          >
-              <div>
-                <h1>{this.state.query}</h1>
-                <p>{this.state.placeData.formatted_address}</p>
-                <a href={'https://developers.google.com/maps/documentation/javascript/tutorial'} target={'_blank'}>
-                  <button>display link to create a review</button>
-                </a>
-                <TestComponent placeData={this.state.placeData} />
-              </div>
-          </InfoWindow>
-        </Map>
+          <div className="autocomplete-dropdown-container">
+            {loading && <div>Loading...</div>}
+            {suggestions.map(suggestion => {
+              const className = suggestion.active
+                ? 'suggestion-item--active'
+                : 'suggestion-item';
+              // inline style for demonstration purpose
+              const style = suggestion.active
+                ? { backgroundColor: '#fafafa', cursor: 'pointer' }
+                : { backgroundColor: '#ffffff', cursor: 'pointer' };
+              return (
+                <div
+                  {...getSuggestionItemProps(suggestion, {
+                    className,
+                    style,
+                  })}
+                >
+                  <span>{suggestion.description}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      </PlacesAutocomplete>
+      
+      {(this.state.userLocation && map)}
+      
     </div>
   )
 }
