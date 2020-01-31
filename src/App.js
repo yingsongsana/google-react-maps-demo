@@ -61,6 +61,7 @@ onInfoWindowClose = () => {
   this.setState({ showWindow: false })
 }
 
+// handles Map click events
 clickMap = (mapProps, map, clickEvent) => {
   console.log('clicked map')
   console.log(clickEvent)
